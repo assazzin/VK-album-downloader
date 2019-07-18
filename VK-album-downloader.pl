@@ -1,11 +1,11 @@
 use LWP::UserAgent;
 
 $url = shift || die " [+] Usage: perl $0 [URL]\n";
-unless($url=~/^https?:\/\/vk\.com\//) {
+unless($url=~/^(?:https?:\/\/)?vk\.com\/(\w+).*$/) {
 	die " [!] The URL prefix should start with \"https://vk.com/\"\n";
 }
 
-($albumName) = $url =~ /.*\/(.*)$/;
+($albumName) = $url =~ /.*\/(\w*)$/;
 $previewFolder = $albumName . "-preview";
 $imageFolder = $albumName . "-image";
 
