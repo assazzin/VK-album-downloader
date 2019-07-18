@@ -1,7 +1,7 @@
 use LWP::UserAgent;
 
 $url = shift || die " [+] Usage: perl $0 [URL]\n";
-unless($url=~/^(?:https?:\/\/)?vk\.com\/(\w+).*$/) {
+unless($url =~ /^(?:https?:\/\/)?vk\.com\/(\w+).*$/) {
 	die " [!] The URL prefix should start with \"https://vk.com/\"\n";
 }
 
@@ -11,26 +11,22 @@ $imageFolder = $albumName . "-image";
 
 print " [+] VK album downloader\n";
 print " [+] Download only preview [y/N]: ";
-chomp($input=<STDIN>);
+chomp($input = <STDIN>);
 $isPreview = uc($input) eq 'Y' ? "true" : "false";
 print " [+] Checking media files on url: $url\n";
 
-$agent=LWP::UserAgent->new();
-
-if($isPreview eq "true") {
-	mkdir($previewFolder);
-}
+$agent = LWP::UserAgent->new();
 
 $offset = 0;
 do {
 	$checkLastOffset = $offset;
-	$content=$agent->post($url,[
+	$content = $agent->post($url,[
 		"al" => "1",
 		"offset" => $offset,
 		"part" => "1"
 	])->content;
 
-	while($content=~/background-image: url\((.*?)\)/g) {
+	while($content =~ /background-image: url\((.*?)\)/g) {
 		$imageURL = $1;
 		push(@imageURLs, $imageURL);
 		$offset++;
@@ -41,6 +37,7 @@ print " [+] Found $offset images.\n";
 sleep(1);
 
 if($isPreview eq "true") {
+	mkdir($previewFolder);
 	print " [+] Downloading preview images...\n";
 	foreach $imageURL (@imageURLs) {
 		($imageName) = $imageURL =~ /.*\/(.*)$/;
@@ -56,7 +53,7 @@ $offset = 0;
 
 print " [+] Downloading full images...\n";
 do {
-	$content=$agent->post('https://vk.com/al_photos.php',[
+	$content = $agent->post('https://vk.com/al_photos.php',[
 		"act" => "show",
 		"al" => "1",
 		"direction" => "1",
@@ -65,10 +62,10 @@ do {
 	])->content;
 	@contentArray = split(/"id":/, $content);
 	foreach $content (@contentArray) {
-		if($content=~/^"(.*?)".*_src":"(.*?)"/g) {
+		if($content =~ /^"(.*?)".*_src":"(.*?)"/g) {
 			$id = $1;
 			$imageURL = $2;
-			$imageURL=~s/\\\//\//g;
+			$imageURL =~ s/\\\//\//g;
 			($imageName) = $imageURL =~ /.*\/(.*)$/;
 			$offset++;
 			print "     => [$offset/$imageCount][ID:$id] $imageURL\n";
